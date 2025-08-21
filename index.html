@@ -117,101 +117,111 @@
             background-color: #333;
             color: #fff;
         }
+
+        .copyright {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            color: #ff69b4;
+            font-size: 0.9rem;
+            opacity: 0.5;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
-<div class="controls">
-    <label for="customText">Nhập chữ muốn hiển thị:</label>
-    <input type="text" id="customText" value="LOVE YOU">
-</div>
+    <div class="controls">
+        <label for="customText">Nhập chữ muốn hiển thị:</label>
+        <input type="text" id="customText" value="LOVE YOU">
+    </div>
 
-<div id="animation-container" style="position: relative; width: 100%; height: 100vh;">
-</div>
+    <div id="animation-container" style="position: relative; width: 100%; height: 100vh;">
+    </div>
 
-<script>
-    const container = document.getElementById('animation-container');
-    const customTextElement = document.getElementById('customText');
-    const controlsPanel = document.querySelector('.controls');
+    <div class="copyright">
+        &copy; Copyright by NMĐ
+    </div>
 
-    function createFallingItem() {
-        const item = document.createElement('div');
-        item.classList.add('falling-item');
+    <script>
+        const container = document.getElementById('animation-container');
+        const customTextElement = document.getElementById('customText');
+        const controlsPanel = document.querySelector('.controls');
 
-        const isHeart = Math.random() < 0.5;
-        const rotationAngle = 20;
-        const currentText = customTextElement.value.toUpperCase();
+        function createFallingItem() {
+            const item = document.createElement('div');
+            item.classList.add('falling-item');
 
-        if (isHeart) {
-            const heartSpan = document.createElement('span');
-            heartSpan.classList.add('heart');
-            item.appendChild(heartSpan);
-            const heartSize = Math.random() * 20 + 15;
-            item.style.width = `${heartSize}px`;
-            item.style.height = `${heartSize}px`;
-            item.style.left = `${Math.random() * 100}vw`;
+            const isHeart = Math.random() < 0.5;
+            const rotationAngle = 20;
+            const currentText = customTextElement.value.toUpperCase();
 
-            item.style.setProperty('--rotX', '0deg');
-            item.style.setProperty('--rotY', `${rotationAngle}deg`);
-            item.style.setProperty('--rotZ', '0deg');
-            item.style.setProperty('--x-offset', '0px');
+            if (isHeart) {
+                const heartSpan = document.createElement('span');
+                heartSpan.classList.add('heart');
+                item.appendChild(heartSpan);
+                const heartSize = Math.random() * 20 + 15;
+                item.style.width = `${heartSize}px`;
+                item.style.height = `${heartSize}px`;
+                item.style.left = `${Math.random() * 100}vw`;
 
-        } else {
-            const text = document.createElement('div');
-            text.classList.add('love-text');
-            text.textContent = currentText;
-            item.appendChild(text);
+                item.style.setProperty('--rotX', '0deg');
+                item.style.setProperty('--rotY', `${rotationAngle}deg`);
+                item.style.setProperty('--rotZ', '0deg');
+                item.style.setProperty('--x-offset', '0px');
 
-            item.style.fontSize = `${Math.random() * 1 + 1}rem`;
+            } else {
+                const text = document.createElement('div');
+                text.classList.add('love-text');
+                text.textContent = currentText;
+                item.appendChild(text);
 
-            const minDistance = 20;
-            let randomLeft = Math.random() * 100;
-            let isTooClose = false;
+                item.style.fontSize = `${Math.random() * 1 + 1}rem`;
 
-            const existingItems = document.querySelectorAll('.love-text');
-            existingItems.forEach(existingItem => {
-                const existingLeft = parseFloat(existingItem.style.left);
-                const distance = Math.abs(randomLeft - existingLeft);
-                if (distance < minDistance) {
-                    isTooClose = true;
+                const minDistance = 20;
+                let randomLeft = Math.random() * 100;
+                let isTooClose = false;
+
+                const existingItems = document.querySelectorAll('.love-text');
+                existingItems.forEach(existingItem => {
+                    const existingLeft = parseFloat(existingItem.style.left);
+                    const distance = Math.abs(randomLeft - existingLeft);
+                    if (distance < minDistance) {
+                        isTooClose = true;
+                    }
+                });
+
+                if (isTooClose) {
+                    item.remove();
+                    return;
                 }
-            });
 
-            if (isTooClose) {
-                item.remove();
-                return;
+                item.style.left = `${randomLeft}vw`;
+
+                item.style.setProperty('--rotX', '0deg');
+                item.style.setProperty('--rotY', `${rotationAngle}deg`);
+                item.style.setProperty('--rotZ', '0deg');
+                item.style.setProperty('--x-offset', '0px');
             }
 
-            item.style.left = `${randomLeft}vw`;
+            item.style.animationDuration = `${Math.random() * 5 + 5}s`;
+            item.style.animationDelay = `${Math.random() * 3}s`;
 
-            item.style.setProperty('--rotX', '0deg');
-            item.style.setProperty('--rotY', `${rotationAngle}deg`);
-            item.style.setProperty('--rotZ', '0deg');
-            item.style.setProperty('--x-offset', '0px');
+            container.appendChild(item);
+
+            setTimeout(() => {
+                item.remove();
+            }, parseFloat(item.style.animationDuration) * 1000);
         }
 
-        item.style.animationDuration = `${Math.random() * 5 + 5}s`;
-        item.style.animationDelay = `${Math.random() * 3}s`;
+        setInterval(createFallingItem, 100);
 
-        container.appendChild(item);
-
-        setTimeout(() => {
-            item.remove();
-        }, parseFloat(item.style.animationDuration) * 1000);
-    }
-
-    setInterval(createFallingItem, 100);
-
-    // Thêm chức năng phím tắt
-    document.addEventListener('keydown', (event) => {
-        // Kiểm tra xem phím "C" có được nhấn không
-        if (event.key === 'c' || event.key === 'C') {
-            // Ngăn chặn sự kiện mặc định để tránh lỗi trên trình duyệt
-            event.preventDefault();
-
-            // Thêm/xóa class "hidden" để ẩn/hiện ô điều khiển
-            controlsPanel.classList.toggle('hidden');
-        }
-    });
-</script>
+        // Thêm chức năng phím tắt
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'c' || event.key === 'C') {
+                event.preventDefault();
+                controlsPanel.classList.toggle('hidden');
+            }
+        });
+    </script>
 </body>
 </html>
