@@ -1,204 +1,98 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chữ và tim rơi (Có thể tùy chỉnh)</title>
-<style>
-body {
-background-color: #000;
-margin: 0;
-overflow: hidden;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-perspective: 800px;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chữ và tim rơi (Có thể tùy chỉnh)</title>
+    <style>
+        body {
+            background-color: #000;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            perspective: 800px;
+        }
 
-    .falling-item {
-        position: absolute;
-        opacity: 0;
-        animation: fall linear infinite;
-    }
-
-    .heart {
-        width: 20px;
-        height: 20px;
-        background-color: #ff69b4;
-        display: inline-block;
-        transform: rotate(-45deg);
-        position: relative;
-    }
-
-    .heart::before,
-    .heart::after {
-        content: '';
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background-color: #ff69b4;
-        position: absolute;
-    }
-
-    .heart::before {
-        top: -10px;
-        left: 0;
-    }
-
-    .heart::after {
-        top: 0;
-        left: 10px;
-    }
-
-    .love-text {
-        color: #ff69b4;
-        font-size: 2rem;
-        font-weight: bold;
-        text-shadow: 0 0 5px #ff007f, 0 0 10px #ff007f, 0 0 15px #ff007f;
-        transform-style: preserve-3d;
-        white-space: nowrap; /* Đảm bảo chữ không bị xuống dòng */
-    }
-
-    @keyframes fall {
-        0% {
-            top: -50px;
+        .falling-item {
+            position: absolute;
             opacity: 0;
-            transform:
-                translateX(var(--x-offset, 0))
-                rotateX(var(--rotX, 0))
-                rotateY(var(--rotY, 0))
-                rotateZ(var(--rotZ, 0));
+            animation: fall linear infinite;
         }
-        50% {
-            opacity: 1;
-            transform:
-                translateX(var(--x-offset, 0))
-                rotateX(var(--rotX, 0))
-                rotateY(var(--rotY, 0))
-                rotateZ(var(--rotZ, 0));
+
+        .heart {
+            width: 20px;
+            height: 20px;
+            background-color: #ff69b4;
+            display: inline-block;
+            transform: rotate(-45deg);
+            position: relative;
         }
-        100% {
-            top: 110vh;
-            opacity: 0;
-            transform:
-                translateX(var(--x-offset, 0))
-                rotateX(var(--rotX, 0))
-                rotateY(var(--rotY, 0))
-                rotateZ(var(--rotZ, 0));
+
+        .heart::before,
+        .heart::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #ff69b4;
+            position: absolute;
         }
-    }
 
-    .controls {
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        background-color: rgba(0, 0, 0, 0.7);
-        color: #fff;
-        padding: 15px;
-        border-radius: 5px;
-        z-index: 1000;
-    }
+        .heart::before {
+            top: -10px;
+            left: 0;
+        }
 
-    .controls label {
-        display: block;
-        margin-bottom: 5px;
-    }
+        .heart::after {
+            top: 0;
+            left: 10px;
+        }
 
-    .controls input {
-        padding: 8px;
-        margin-bottom: 10px;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        width: 200px;
-        background-color: #333;
-        color: #fff;
-    }
-</style>
-</head>
-<body>
-<div class="controls">
-<label for="customText">Nhập chữ muốn hiển thị:</label>
-<input type="text" id="customText" value="LOVE YOU">
-</div>
+        .love-text {
+            color: #ff69b4;
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 0 5px #ff007f, 0 0 10px #ff007f, 0 0 15px #ff007f;
+            transform-style: preserve-3d;
+            white-space: nowrap; /* Đảm bảo chữ không bị xuống dòng */
+        }
 
-<div id="animation-container" style="position: relative; width: 100%; height: 100vh;">
-</div>
-
-<script>
-    const container = document.getElementById('animation-container');
-    const customTextElement = document.getElementById('customText');
-
-    function createFallingItem() {
-        const item = document.createElement('div');
-        item.classList.add('falling-item');
-
-        const isHeart = Math.random() < 0.5;
-        const rotationAngle = 20;
-        const currentText = customTextElement.value.toUpperCase(); // Lấy chữ từ ô input và in hoa
-
-        if (isHeart) {
-            const heartSpan = document.createElement('span');
-            heartSpan.classList.add('heart');
-            item.appendChild(heartSpan);
-            const heartSize = Math.random() * 20 + 15;
-            item.style.width = `${heartSize}px`;
-            item.style.height = `${heartSize}px`;
-            item.style.left = `${Math.random() * 100}vw`;
-
-            item.style.setProperty('--rotX', '0deg');
-            item.style.setProperty('--rotY', `${rotationAngle}deg`);
-            item.style.setProperty('--rotZ', '0deg');
-            item.style.setProperty('--x-offset', '0px');
-
-        } else {
-            const text = document.createElement('div');
-            text.classList.add('love-text');
-            text.textContent = currentText; // Sử dụng chữ từ ô input
-            item.appendChild(text);
-
-            item.style.fontSize = `${Math.random() * 1 + 1}rem`;
-
-            const minDistance = 20; // 20vw
-            let randomLeft = Math.random() * 100;
-            let isTooClose = false;
-
-            const existingItems = document.querySelectorAll('.love-text');
-            existingItems.forEach(existingItem => {
-                const existingLeft = parseFloat(existingItem.style.left);
-                const distance = Math.abs(randomLeft - existingLeft);
-                if (distance < minDistance) {
-                    isTooClose = true;
-                }
-            });
-
-            if (isTooClose) {
-                item.remove();
-                return;
+        @keyframes fall {
+            0% {
+                top: -50px;
+                opacity: 0;
+                transform:
+                    translateX(var(--x-offset, 0))
+                    rotateX(var(--rotX, 0))
+                    rotateY(var(--rotY, 0))
+                    rotateZ(var(--rotZ, 0));
             }
-
-            item.style.left = `${randomLeft}vw`;
-
-            item.style.setProperty('--rotX', '0deg');
-            item.style.setProperty('--rotY', `${rotationAngle}deg`);
-            item.style.setProperty('--rotZ', '0deg');
-            item.style.setProperty('--x-offset', '0px');
+            50% {
+                opacity: 1;
+                transform:
+                    translateX(var(--x-offset, 0))
+                    rotateX(var(--rotX, 0))
+                    rotateY(var(--rotY, 0))
+                    rotateZ(var(--rotZ, 0));
+            }
+            100% {
+                top: 110vh;
+                opacity: 0;
+                transform:
+                    translateX(var(--x-offset, 0))
+                    rotateX(var(--rotX, 0))
+                    rotateY(var(--rotY, 0))
+                    rotateZ(var(--rotZ, 0));
+            }
         }
 
-        item.style.animationDuration = `${Math.random() * 5 + 5}s`;
-        item.style.animationDelay = `${Math.random() * 3}s`;
-
-        container.appendChild(item);
-
-        setTimeout(() => {
-            item.remove();
-        }, parseFloat(item.style.animationDuration) * 1000);
-    }
-
-    setInterval(createFallingItem, 100);
-
-    // Lắng nghe sự thay đổi trong ô input để cập nhật chữ (tùy chọn, nếu bạn muốn cập nhật liên tục khi gõ)
-    // customTextElement.addEventListener('input', () => {
-    //     // Có thể thêm logic để làm mới hiệu ứng nếu cần
-    // });
-</script>
-</body>
-</html>
+        .controls {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            transition: opacity 0.5s
