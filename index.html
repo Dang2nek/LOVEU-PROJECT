@@ -57,6 +57,12 @@
             white-space: nowrap;
         }
 
+        .falling-emoji {
+            font-size: 2rem;
+            text-shadow: 0 0 5px #ff007f, 0 0 10px #ff007f, 0 0 15px #ff007f;
+            transform-style: preserve-3d;
+        }
+
         @keyframes fall {
             0% {
                 top: -50px;
@@ -96,6 +102,9 @@
             border-radius: 5px;
             z-index: 1000;
             transition: opacity 0.5s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .controls.hidden {
@@ -108,14 +117,17 @@
             margin-bottom: 5px;
         }
 
-        .controls input {
+        .controls input, .controls select {
             padding: 8px;
-            margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 3px;
             width: 200px;
             background-color: #333;
             color: #fff;
+        }
+        
+        #customEmoji {
+            display: none; /* Ẩn ban đầu */
         }
 
         .copyright {
@@ -248,8 +260,22 @@
     </div>
 
     <div class="controls">
-        <label id="inputLabel" for="customText">Nhập chữ muốn hiển thị:</label>
-        <input type="text" id="customText" value="LOVE YOU">
+        <div class="control-group">
+            <label id="itemTypeLabel" for="itemTypeSelect">Chọn loại vật rơi:</label>
+            <select id="itemTypeSelect" onchange="toggleInputs()">
+                <option value="text">Chữ</option>
+                <option value="heart">Tim (Mặc định)</option>
+                <option value="emoji">Emoji</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label id="customTextLabel" for="customText">Nhập chữ muốn hiển thị:</label>
+            <input type="text" id="customText" value="I LOVE YOU">
+        </div>
+        <div class="control-group">
+            <label id="customEmojiLabel" for="customEmoji">Nhập emoji:</label>
+            <input type="text" id="customEmoji" value="❤️">
+        </div>
     </div>
 
     <div id="animation-container" style="position: relative; width: 100%; height: 100vh;">
@@ -266,6 +292,8 @@
     <script>
         const container = document.getElementById('animation-container');
         const customTextElement = document.getElementById('customText');
+        const customEmojiElement = document.getElementById('customEmoji');
+        const itemTypeSelect = document.getElementById('itemTypeSelect');
         const controlsPanel = document.querySelector('.controls');
         const copyrightPanel = document.querySelector('.copyright');
         const modal = document.getElementById('instructionModal');
@@ -275,7 +303,12 @@
 
         const translations = {
             'vi': {
-                'inputLabel': 'Nhập chữ muốn hiển thị:',
+                'itemTypeLabel': 'Chọn loại vật rơi:',
+                'itemTypeOption1': 'Chữ',
+                'itemTypeOption2': 'Tim (Mặc định)',
+                'itemTypeOption3': 'Emoji',
+                'customTextLabel': 'Nhập chữ muốn hiển thị:',
+                'customEmojiLabel': 'Nhập emoji:',
                 'modalTitle': 'Hướng Dẫn Phím Tắt',
                 'modalInfo1': 'Nhấn phím <strong>C</strong> để ẩn/hiện ô nhập liệu.',
                 'modalInfo2': 'Nhấn phím <strong>D</strong> để ẩn/hiện dòng chữ bản quyền.',
@@ -285,7 +318,12 @@
                 'aiDisclaimer': 'Mã được tạo bởi AI (Gemini)'
             },
             'en': {
-                'inputLabel': 'Enter the text to display:',
+                'itemTypeLabel': 'Select falling item:',
+                'itemTypeOption1': 'Text',
+                'itemTypeOption2': 'Heart (Default)',
+                'itemTypeOption3': 'Emoji',
+                'customTextLabel': 'Enter the text to display:',
+                'customEmojiLabel': 'Enter emoji:',
                 'modalTitle': 'Keyboard Shortcuts Guide',
                 'modalInfo1': 'Press <strong>C</strong> to hide/show the input box.',
                 'modalInfo2': 'Press <strong>D</strong> to hide/show the copyright line.',
@@ -297,7 +335,12 @@
         };
 
         function changeLanguage(lang) {
-            document.getElementById('inputLabel').innerHTML = translations[lang]['inputLabel'];
+            document.getElementById('itemTypeLabel').innerHTML = translations[lang]['itemTypeLabel'];
+            document.getElementById('itemTypeSelect').options[0].text = translations[lang]['itemTypeOption1'];
+            document.getElementById('itemTypeSelect').options[1].text = translations[lang]['itemTypeOption2'];
+            document.getElementById('itemTypeSelect').options[2].text = translations[lang]['itemTypeOption3'];
+            document.getElementById('customTextLabel').innerHTML = translations[lang]['customTextLabel'];
+            document.getElementById('customEmojiLabel').innerHTML = translations[lang]['customEmojiLabel'];
             document.getElementById('modalTitle').innerHTML = translations[lang]['modalTitle'];
             document.getElementById('modalInfo1').innerHTML = translations[lang]['modalInfo1'];
             document.getElementById('modalInfo2').innerHTML = translations[lang]['modalInfo2'];
@@ -315,8 +358,24 @@
             changeLanguage('vi');
         }
 
+        function toggleInputs() {
+            const itemType = itemTypeSelect.value;
+            if (itemType === 'text') {
+                document.getElementById('customText').style.display = 'block';
+                document.getElementById('customEmoji').style.display = 'none';
+            } else if (itemType === 'emoji') {
+                document.getElementById('customText').style.display = 'none';
+                document.getElementById('customEmoji').style.display = 'block';
+            } else { // heart
+                document.getElementById('customText').style.display = 'none';
+                document.getElementById('customEmoji').style.display = 'none';
+            }
+        }
+
         window.onload = function() {
             modal.style.display = "flex";
+            itemTypeSelect.value = 'heart'; // Đặt mặc định là trái tim
+            toggleInputs();
         };
 
         function closeModal() {
@@ -332,11 +391,10 @@
         function createFallingItem() {
             const item = document.createElement('div');
             item.classList.add('falling-item');
-            const isHeart = Math.random() < 0.5;
+            const itemType = itemTypeSelect.value;
             const rotationAngle = 20;
-            const currentText = customTextElement.value.toUpperCase();
 
-            if (isHeart) {
+            if (itemType === 'heart') {
                 const heartSpan = document.createElement('span');
                 heartSpan.classList.add('heart');
                 item.appendChild(heartSpan);
@@ -349,7 +407,25 @@
                 item.style.setProperty('--rotZ', '0deg');
                 item.style.setProperty('--x-offset', '0px');
 
-            } else {
+            } else if (itemType === 'emoji') {
+                const emoji = customEmojiElement.value.trim();
+                if (emoji.length === 0) {
+                    item.remove();
+                    return;
+                }
+                const emojiText = document.createElement('div');
+                emojiText.classList.add('falling-emoji');
+                emojiText.textContent = emoji;
+                item.appendChild(emojiText);
+                item.style.fontSize = `${Math.random() * 1.5 + 1.5}rem`;
+                item.style.left = `${Math.random() * 100}vw`;
+                item.style.setProperty('--rotX', '0deg');
+                item.style.setProperty('--rotY', `${rotationAngle}deg`);
+                item.style.setProperty('--rotZ', '0deg');
+                item.style.setProperty('--x-offset', '0px');
+
+            } else { // text
+                const currentText = customTextElement.value.toUpperCase();
                 const text = document.createElement('div');
                 text.classList.add('love-text');
                 text.textContent = currentText;
