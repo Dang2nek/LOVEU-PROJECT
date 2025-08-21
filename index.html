@@ -95,4 +95,123 @@
             padding: 15px;
             border-radius: 5px;
             z-index: 1000;
-            transition: opacity 0.5s
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .controls.hidden {
+            opacity: 0;
+            pointer-events: none; /* Ngăn chặn click khi bị ẩn */
+        }
+
+        .controls label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .controls input {
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<div class="controls">
+    <label for="customText">Nhập chữ muốn hiển thị:</label>
+    <input type="text" id="customText" value="LOVE YOU">
+</div>
+
+<div id="animation-container" style="position: relative; width: 100%; height: 100vh;">
+</div>
+
+<script>
+    const container = document.getElementById('animation-container');
+    const customTextElement = document.getElementById('customText');
+    const controlsPanel = document.querySelector('.controls');
+
+    function createFallingItem() {
+        const item = document.createElement('div');
+        item.classList.add('falling-item');
+
+        const isHeart = Math.random() < 0.5;
+        const rotationAngle = 20;
+        const currentText = customTextElement.value.toUpperCase();
+
+        if (isHeart) {
+            const heartSpan = document.createElement('span');
+            heartSpan.classList.add('heart');
+            item.appendChild(heartSpan);
+            const heartSize = Math.random() * 20 + 15;
+            item.style.width = `${heartSize}px`;
+            item.style.height = `${heartSize}px`;
+            item.style.left = `${Math.random() * 100}vw`;
+
+            item.style.setProperty('--rotX', '0deg');
+            item.style.setProperty('--rotY', `${rotationAngle}deg`);
+            item.style.setProperty('--rotZ', '0deg');
+            item.style.setProperty('--x-offset', '0px');
+
+        } else {
+            const text = document.createElement('div');
+            text.classList.add('love-text');
+            text.textContent = currentText;
+            item.appendChild(text);
+
+            item.style.fontSize = `${Math.random() * 1 + 1}rem`;
+
+            const minDistance = 20;
+            let randomLeft = Math.random() * 100;
+            let isTooClose = false;
+
+            const existingItems = document.querySelectorAll('.love-text');
+            existingItems.forEach(existingItem => {
+                const existingLeft = parseFloat(existingItem.style.left);
+                const distance = Math.abs(randomLeft - existingLeft);
+                if (distance < minDistance) {
+                    isTooClose = true;
+                }
+            });
+
+            if (isTooClose) {
+                item.remove();
+                return;
+            }
+
+            item.style.left = `${randomLeft}vw`;
+
+            item.style.setProperty('--rotX', '0deg');
+            item.style.setProperty('--rotY', `${rotationAngle}deg`);
+            item.style.setProperty('--rotZ', '0deg');
+            item.style.setProperty('--x-offset', '0px');
+        }
+
+        item.style.animationDuration = `${Math.random() * 5 + 5}s`;
+        item.style.animationDelay = `${Math.random() * 3}s`;
+
+        container.appendChild(item);
+
+        setTimeout(() => {
+            item.remove();
+        }, parseFloat(item.style.animationDuration) * 1000);
+    }
+
+    setInterval(createFallingItem, 100);
+
+    // Thêm chức năng phím tắt
+    document.addEventListener('keydown', (event) => {
+        // Kiểm tra xem phím "C" có được nhấn không
+        if (event.key === 'c' || event.key === 'C') {
+            // Ngăn chặn sự kiện mặc định để tránh lỗi trên trình duyệt
+            event.preventDefault();
+
+            // Thêm/xóa class "hidden" để ẩn/hiện ô điều khiển
+            controlsPanel.classList.toggle('hidden');
+        }
+    });
+</script>
+</body>
+</html>
