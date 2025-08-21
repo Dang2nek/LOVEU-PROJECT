@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chữ và tim rơi</title>
+    <style>
+        body {
+            background-color: #000;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            perspective: 800px;
+        }
+
+        .falling-item {
+            position: absolute;
+            opacity: 0;
+            animation: fall linear infinite;
+        }
+
+        .heart {
+            width: 20px;
+            height: 20px;
+            background-color: #ff69b4;
+            display: inline-block;
+            transform: rotate(-45deg);
+            position: relative;
+        }
+
+        .heart::before,
+        .heart::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #ff69b4;
+            position: absolute;
+        }
+
+        .heart::before {
+            top: -10px;
+            left: 0;
+        }
+
+        .heart::after {
+            top: 0;
+            left: 10px;
+        }
+
+        .love-text {
+            color: #ff69b4;
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 0 5px #ff007f, 0 0 10px #ff007f, 0 0 15px #ff007f;
+            transform-style: preserve-3d;
+            white-space: nowrap; /* Đảm bảo chữ không bị xuống dòng */
+        }
+
+        @keyframes fall {
+            0% {
+                top: -50px;
+                opacity: 0;
+                transform: 
+                    translateX(var(--x-offset, 0))
+                    rotateX(var(--rotX, 0))
+                    rotateY(var(--rotY, 0))
+                    rotateZ(var(--rotZ, 0));
+            }
+            50% {
+                opacity: 1;
+                transform: 
+                    translateX(var(--x-offset, 0))
+                    rotateX(var(--rotX, 0))
+                    rotateY(var(--rotY, 0))
+                    rotateZ(var(--rotZ, 0));
+            }
+            100% {
+                top: 110vh;
+                opacity: 0;
+                transform: 
+                    translateX(var(--x-offset, 0))
+                    rotateX(var(--rotX, 0))
+                    rotateY(var(--rotY, 0))
+                    rotateZ(var(--rotZ, 0));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="animation-container" style="position: relative; width: 100%; height: 100vh;">
+    </div>
+
+    <script>
+        const container = document.getElementById('animation-container');
+        
+        function createFallingItem() {
+            const item = document.createElement('div');
+            item.classList.add('falling-item');
+            
+            const isHeart = Math.random() < 0.5;
+            const rotationAngle = 20;
+
+            if (isHeart) {
+                const heartSpan = document.createElement('span');
+                heartSpan.classList.add('heart');
+                item.appendChild(heartSpan);
+                const heartSize = Math.random() * 20 + 15;
+                item.style.width = `${heartSize}px`;
+                item.style.height = `${heartSize}px`;
+                item.style.left = `${Math.random() * 100}vw`;
+
+                item.style.setProperty('--rotX', '0deg');
+                item.style.setProperty('--rotY', `${rotationAngle}deg`);
+                item.style.setProperty('--rotZ', '0deg');
+                item.style.setProperty('--x-offset', '0px');
+                
+            } else {
+                const text = document.createElement('div');
+                text.classList.add('love-text');
+                text.textContent = 'Play with me';
+                item.appendChild(text);
+
+                // Giảm kích thước chữ để vừa hơn
+                item.style.fontSize = `${Math.random() * 1 + 1}rem`;
+                
+                // Đảm bảo chữ không quá gần nhau
+                const minDistance = 20; // 20vw
+                let randomLeft = Math.random() * 100;
+                let isTooClose = false;
+                
+                const existingItems = document.querySelectorAll('.love-text');
+                existingItems.forEach(existingItem => {
+                    const existingLeft = parseFloat(existingItem.style.left);
+                    const distance = Math.abs(randomLeft - existingLeft);
+                    if (distance < minDistance) {
+                        isTooClose = true;
+                    }
+                });
+                
+                if (isTooClose) {
+                    // Nếu quá gần, không tạo chữ nữa
+                    item.remove();
+                    return;
+                }
+
+                item.style.left = `${randomLeft}vw`;
+
+                item.style.setProperty('--rotX', '0deg');
+                item.style.setProperty('--rotY', `${rotationAngle}deg`);
+                item.style.setProperty('--rotZ', '0deg');
+                item.style.setProperty('--x-offset', '0px');
+            }
+
+            item.style.animationDuration = `${Math.random() * 5 + 5}s`;
+            item.style.animationDelay = `${Math.random() * 3}s`;
+
+            container.appendChild(item);
+
+            setTimeout(() => {
+                item.remove();
+            }, parseFloat(item.style.animationDuration) * 1000);
+        }
+
+        setInterval(createFallingItem, 100);
+    </script>
+</body>
+</html>
